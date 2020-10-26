@@ -278,6 +278,8 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncLastTableChanges_before_update` BEFORE UPDATE ON `SyncLastTableChanges` FOR EACH ROW BEGIN
+set @sync = current_timestamp(3);
+set NEW.LastUpdateTime = @sync;
 set NEW.RowVersion = UUID();
 END */;;
 DELIMITER ;
@@ -303,7 +305,9 @@ CREATE TABLE `SyncProtocolClients` (
   `SyncTo` timestamp(3) NULL DEFAULT NULL,
   `SyncId` char(36) DEFAULT NULL,
   `SyncResponse` json DEFAULT NULL,
-  `InsertedOn` timestamp(3) NULL DEFAULT NULL,
+  `CreateTime` timestamp(3) NULL DEFAULT current_timestamp(3),
+  `UpdateTime` timestamp(3) NULL DEFAULT NULL,
+  `DeleteTime` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -315,10 +319,6 @@ CREATE TABLE `SyncProtocolClients` (
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncProtocolClients_before_insert` BEFORE INSERT ON `SyncProtocolClients` FOR EACH ROW BEGIN
-  SET NEW.InsertedOn = current_timestamp(3);
-END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -484,7 +484,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastUpdateTime = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastDeleteTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -542,7 +542,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastUpdateTime = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastCreateTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
