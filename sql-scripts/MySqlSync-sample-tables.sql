@@ -30,7 +30,7 @@ CREATE TABLE `TableByDate` (
   `Ort` varchar(50) NOT NULL,
   `syncTimestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -101,7 +101,7 @@ CREATE TABLE `TableByDate2` (
   `Ort` varchar(50) NOT NULL,
   `syncTimestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -172,7 +172,7 @@ CREATE TABLE `TableByDate3` (
   `Ort` varchar(50) DEFAULT NULL,
   `syncTimestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+)mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -242,7 +242,7 @@ CREATE TABLE `TableByIds` (
   `Produkt` varchar(50) NOT NULL,
   `Beschreibung` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -308,7 +308,7 @@ CREATE TABLE `TableByIds2` (
   `Produkt` varchar(50) NOT NULL,
   `Beschreibung` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+)mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;

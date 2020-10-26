@@ -29,7 +29,7 @@ CREATE TABLE `SyncClientConfiguration` (
   `UserName` varchar(50) NOT NULL,
   `DeviceId` varchar(50) NOT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -85,7 +85,7 @@ CREATE TABLE `SyncClientState` (
   `CurrentTableChangesRowId` char(36) DEFAULT NULL,
   `CurrentSyncId` char(36) DEFAULT NULL,
   PRIMARY KEY (`DeviceId`,`TableName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -104,7 +104,7 @@ CREATE TABLE `SyncConfiguration` (
   `SyncOrder` int NOT NULL DEFAULT '1',
   `SyncMode` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -170,7 +170,7 @@ CREATE TABLE `SyncDeletedRows` (
   `SyncTimestamp` timestamp NULL DEFAULT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -227,7 +227,7 @@ CREATE TABLE `SyncLastTableChanges` (
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`),
   UNIQUE KEY `TableName` (`TableName`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -283,7 +283,7 @@ CREATE TABLE `SyncProtocolClients` (
   `SyncResponse` json DEFAULT NULL,
   `InsertedOn` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2211 DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -317,7 +317,7 @@ CREATE TABLE `SyncSystemLog` (
   `Code` char(5) DEFAULT NULL,
   `SqlCommand` text,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
