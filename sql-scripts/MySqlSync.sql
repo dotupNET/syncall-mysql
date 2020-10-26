@@ -128,7 +128,7 @@ DELIMITER ;;
 
   if not (NEW.SyncMode = '2') then
     insert into 
-      SyncLastTableChanges ( TableName, LastChange )
+      SyncLastTableChanges ( TableName, ChangeTime )
     values 
       (NEW.TableName, current_timestamp(3) );
       
@@ -197,7 +197,7 @@ DELIMITER ;;
     set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
-    update SyncLastTableChanges set LastChange = @sync where TableName = "DeletedRows";
+    update SyncLastTableChanges set ChangeTime = @sync where TableName = "DeletedRows";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -217,7 +217,7 @@ DELIMITER ;;
     set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
-    update SyncLastTableChanges set LastChange = @sync where TableName = "DeletedRows";
+    update SyncLastTableChanges set ChangeTime = @sync where TableName = "DeletedRows";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -235,7 +235,7 @@ DROP TABLE IF EXISTS `SyncLastTableChanges`;
 CREATE TABLE `SyncLastTableChanges` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `TableName` varchar(128) NOT NULL,
-  `LastChange` timestamp(3) NOT NULL,
+  `ChangeTime` timestamp(3) NOT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   `CreateTime` timestamp(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
   `UpdateTime` timestamp(3) NULL DEFAULT NULL,
@@ -477,7 +477,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -535,7 +535,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -583,7 +583,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
 
 END ;;
 DELIMITER ;
@@ -619,7 +619,7 @@ BEGIN
       on t.TableName = c.TableName and c.deviceId = device_id
   WHERE  
     c.DeviceId = device_id
---    (t.LastChange>= c.SyncedTo or 
+--    (t.ChangeTime>= c.SyncedTo or 
 --    c.SyncedTo is null)
 --  and
 --    (c.DeviceId = device_id or
