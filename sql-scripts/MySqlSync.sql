@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `IGE_DATA` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `IGE_DATA`;
+CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `MySqlSync`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
--- Host: localhost    Database: IGE_DATA
+-- Host: localhost    Database: MySqlSync
 -- ------------------------------------------------------
 -- Server version	8.0.21
 
@@ -321,7 +321,7 @@ CREATE TABLE `SyncSystemLog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping routines for database 'IGE_DATA'
+-- Dumping routines for database 'MySqlSync'
 --
 /*!50003 DROP PROCEDURE IF EXISTS `SyncCreateClientState` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
