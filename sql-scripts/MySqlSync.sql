@@ -128,9 +128,9 @@ DELIMITER ;;
 
   if not (NEW.SyncMode = '2') then
     insert into 
-      SyncLastTableChanges ( TableName, ChangeTime )
+      SyncLastTableChanges ( TableName )
     values 
-      (NEW.TableName, current_timestamp(3) );
+      (NEW.TableName );
       
     call SyncCreateClientStateOnNewTable(NEW.TableName);
   end if;
@@ -197,7 +197,7 @@ DELIMITER ;;
     set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
-    update SyncLastTableChanges set ChangeTime = @sync where TableName = "DeletedRows";
+    update SyncLastTableChanges set LastUpdateTime = @sync where TableName = "DeletedRows";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -217,7 +217,7 @@ DELIMITER ;;
     set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
-    update SyncLastTableChanges set ChangeTime = @sync where TableName = "DeletedRows";
+    update SyncLastTableChanges set LastUpdateTime = @sync where TableName = "DeletedRows";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -235,9 +235,11 @@ DROP TABLE IF EXISTS `SyncLastTableChanges`;
 CREATE TABLE `SyncLastTableChanges` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `TableName` varchar(128) NOT NULL,
-  `ChangeTime` timestamp(3) NOT NULL,
+  `LastCreateTime` timestamp(3) NULL DEFAULT NULL,
+  `LastUpdateTime` timestamp(3) NULL DEFAULT NULL,
+  `LastDeleteTime` timestamp(3) NULL DEFAULT NULL,
   `RowVersion` char(36) DEFAULT NULL,
-  `CreateTime` timestamp(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `CreateTime` timestamp(3) NULL DEFAULT NULL,
   `UpdateTime` timestamp(3) NULL DEFAULT NULL,
   `DeleteTime` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`),
@@ -254,7 +256,12 @@ CREATE TABLE `SyncLastTableChanges` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncLastTableChanges_before_insert` BEFORE INSERT ON `SyncLastTableChanges` FOR EACH ROW BEGIN
-set NEW.RowVersion = UUID();
+    set @sync = current_timestamp(3);
+    set NEW.LastCreateTime = @sync;
+    set NEW.LastUpdateTime = @sync;
+    set NEW.LastDeleteTime = @sync;
+    set NEW.RowVersion = UUID();
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -477,7 +484,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastUpdateTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -535,7 +542,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastUpdateTime = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -583,7 +590,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set ChangeTime = current_timestamp(3) where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastUpdateTime = current_timestamp(3) where TableName = "DeletedRows";
 
 END ;;
 DELIMITER ;
@@ -619,7 +626,7 @@ BEGIN
       on t.TableName = c.TableName and c.deviceId = device_id
   WHERE  
     c.DeviceId = device_id
---    (t.ChangeTime>= c.SyncedTo or 
+--    (t.LastUpdateTime>= c.SyncedTo or 
 --    c.SyncedTo is null)
 --  and
 --    (c.DeviceId = device_id or
