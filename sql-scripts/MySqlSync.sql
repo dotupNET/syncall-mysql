@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `MySqlSync`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
@@ -29,7 +29,7 @@ CREATE TABLE `SyncClientConfiguration` (
   `UserName` varchar(50) NOT NULL,
   `DeviceId` varchar(50) NOT NULL,
   PRIMARY KEY (`RowId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -85,7 +85,7 @@ CREATE TABLE `SyncClientState` (
   `CurrentTableChangesRowId` char(36) DEFAULT NULL,
   `CurrentSyncId` char(36) DEFAULT NULL,
   PRIMARY KEY (`DeviceId`,`TableName`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -104,7 +104,7 @@ CREATE TABLE `SyncConfiguration` (
   `SyncOrder` int NOT NULL DEFAULT '1',
   `SyncMode` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`RowId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -170,7 +170,7 @@ CREATE TABLE `SyncDeletedRows` (
   `SyncTimestamp` timestamp NULL DEFAULT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -227,7 +227,7 @@ CREATE TABLE `SyncLastTableChanges` (
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`),
   UNIQUE KEY `TableName` (`TableName`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -283,7 +283,7 @@ CREATE TABLE `SyncProtocolClients` (
   `SyncResponse` json DEFAULT NULL,
   `InsertedOn` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -317,7 +317,7 @@ CREATE TABLE `SyncSystemLog` (
   `Code` char(5) DEFAULT NULL,
   `SqlCommand` text,
   PRIMARY KEY (`RowId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -335,8 +335,6 @@ CREATE TABLE `SyncSystemLog` (
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateClientState`(
 	IN `device_id` VARCHAR(50)
-
-
 )
 BEGIN
 
@@ -380,7 +378,6 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateClientStateOnNewTable`(
 	IN `table_name` VARCHAR(50)
-
 )
 BEGIN
 
@@ -420,18 +417,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateDeletedRowForDevices`(
-	IN `table_name` VARCHAR(50)
-,
+	IN `table_name` VARCHAR(50),
 	IN `row_id` INT
-
-
-
-
-
-
 )
 BEGIN
 
@@ -485,14 +475,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateInsertedRowForDevices`(
 	IN `table_name` VARCHAR(128),
 	IN `row_id` INT
-
-
-
 )
 BEGIN
 
@@ -546,13 +533,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateUpdatedRowForDevices`(
 	IN `table_name` VARCHAR(128),
 	IN `row_id` INT
-
-
 )
 BEGIN
   DECLARE done INT DEFAULT FALSE;
@@ -600,23 +585,6 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncGetTablesToSync`(
 	IN `device_id` VARCHAR(50)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 )
 BEGIN
 
@@ -657,39 +625,15 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncInsertOrUpdateClientState`(
 	IN `device_id` VARCHAR(50),
 	IN `table_name` VARCHAR(128),
 	IN `sync_from` TIMESTAMP,
 	IN `sync_to` TIMESTAMP,
-	IN `new_state` INT
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-,
+	IN `new_state` INT,
 	IN `sync_id` CHAR(36)
-
-
-
-
-
 )
 BEGIN
 
@@ -762,92 +706,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncPullRequest`(
 	IN `device_id` VARCHAR(50),
-	IN `table_name` VARCHAR(128)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-,
+	IN `table_name` VARCHAR(128),
 	IN `log_level` INT
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 )
 BEGIN
 
@@ -996,18 +860,8 @@ CREATE DEFINER=`root`@`%` PROCEDURE `SyncPullResponse`(
 	IN `device_id` VARCHAR(50),
 	IN `table_name` VARCHAR(128),
 	IN `new_state` INT,
-	IN `current_sync_id` CHAR(36)
-,
+	IN `current_sync_id` CHAR(36),
 	IN `sync_response` JSON
-
-
-
-
-
-
-
-
-
 )
 BEGIN
 
@@ -1088,9 +942,6 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncResetClientState`(
 	IN `device_id` VARCHAR(50),
 	IN `table_name` VARCHAR(128)
-
-
-
 )
 BEGIN
 
@@ -1136,7 +987,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Sync_Test`()
 BEGIN
@@ -1188,4 +1039,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26  9:40:32
+-- Dump completed on 2020-10-26 11:28:53
