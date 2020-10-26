@@ -280,6 +280,45 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
+-- Table structure for table `SyncProtocolClients`
+--
+
+DROP TABLE IF EXISTS `SyncProtocolClients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `SyncProtocolClients` (
+  `RowId` int NOT NULL AUTO_INCREMENT,
+  `DeviceId` varchar(50) DEFAULT NULL,
+  `TableName` varchar(50) DEFAULT NULL,
+  `State` varchar(50) DEFAULT NULL,
+  `Error` varchar(1024) DEFAULT NULL,
+  `SyncFrom` timestamp(3) NULL DEFAULT NULL,
+  `SyncTo` timestamp(3) NULL DEFAULT NULL,
+  `SyncId` char(36) DEFAULT NULL,
+  `SyncResponse` json DEFAULT NULL,
+  `InsertedOn` timestamp(3) NULL DEFAULT NULL,
+  PRIMARY KEY (`RowId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncProtocolClients_before_insert` BEFORE INSERT ON `SyncProtocolClients` FOR EACH ROW BEGIN
+  SET NEW.InsertedOn = current_timestamp(3);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
 -- Table structure for table `SyncSystemLog`
 --
 
@@ -1018,4 +1057,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26 14:34:30
+-- Dump completed on 2020-10-26 14:48:07
