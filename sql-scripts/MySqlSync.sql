@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `MySqlSync`;
+CREATE DATABASE  IF NOT EXISTS `IGE_DATA` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `IGE_DATA`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
--- Host: localhost    Database: MySqlSync
+-- Host: localhost    Database: IGE_DATA
 -- ------------------------------------------------------
 -- Server version	8.0.21
 
@@ -29,7 +29,7 @@ CREATE TABLE `SyncClientConfiguration` (
   `UserName` varchar(50) NOT NULL,
   `DeviceId` varchar(50) NOT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -85,7 +85,7 @@ CREATE TABLE `SyncClientState` (
   `CurrentTableChangesRowId` char(36) DEFAULT NULL,
   `CurrentSyncId` char(36) DEFAULT NULL,
   PRIMARY KEY (`DeviceId`,`TableName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -104,7 +104,7 @@ CREATE TABLE `SyncConfiguration` (
   `SyncOrder` int NOT NULL DEFAULT '1',
   `SyncMode` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -119,9 +119,11 @@ DELIMITER ;;
 
   if not (NEW.SyncMode = '2') then
     insert into 
-      SyncLastTableChanges ( TableName, LastChange, SyncOrder )
+      SyncLastTableChanges ( TableName, LastChange )
     values 
-      (NEW.TableName, UTC_TIMESTAMP(), NEW.SyncOrder );
+      (NEW.TableName, UTC_TIMESTAMP() );
+      
+    call SyncCreateClientStateOnNewTable(NEW.TableName);
   end if;
   
 END */;;
@@ -142,6 +144,7 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncConfiguration_after_delete` AFTER DELETE ON `SyncConfiguration` FOR EACH ROW BEGIN
   delete from SyncDeletedRows where TableName = OLD.TableName; 
   delete from SyncClientState where TableName = OLD.TableName; 
+  delete from SyncLastTableChanges where TableName = OLD.TableName;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -167,7 +170,7 @@ CREATE TABLE `SyncDeletedRows` (
   `SyncTimestamp` timestamp NULL DEFAULT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -221,11 +224,10 @@ CREATE TABLE `SyncLastTableChanges` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `TableName` varchar(128) NOT NULL,
   `LastChange` timestamp NOT NULL,
-  `SyncOrder` int NOT NULL DEFAULT '0',
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`),
   UNIQUE KEY `TableName` (`TableName`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -281,7 +283,7 @@ CREATE TABLE `SyncProtocolClients` (
   `SyncResponse` json DEFAULT NULL,
   `InsertedOn` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=498 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2211 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -315,11 +317,11 @@ CREATE TABLE `SyncSystemLog` (
   `Code` char(5) DEFAULT NULL,
   `SqlCommand` text,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping routines for database 'MySqlSync'
+-- Dumping routines for database 'IGE_DATA'
 --
 /*!50003 DROP PROCEDURE IF EXISTS `SyncCreateClientState` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -333,6 +335,7 @@ CREATE TABLE `SyncSystemLog` (
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateClientState`(
 	IN `device_id` VARCHAR(50)
+
 
 )
 BEGIN
@@ -351,11 +354,57 @@ BEGIN
       LEAVE read_loop;
     END IF;
 
-    insert into SyncClientState (DeviceId, TableName, State) values (device_id, tableName, 0);
-    
+    if not exists (SELECT * FROM SyncClientState scs WHERE scs.TableName = tableName and scs.DeviceId = device_id) then
+      insert into SyncClientState (DeviceId, TableName, State) values (device_id, tableName, 0);
+    END IF;
+      
   END LOOP;
 
   CLOSE tableCursor;
+    
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `SyncCreateClientStateOnNewTable` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateClientStateOnNewTable`(
+	IN `table_name` VARCHAR(50)
+
+)
+BEGIN
+
+  DECLARE done INT DEFAULT FALSE;
+  declare deviceId varchar(50) DEFAULT null;
+  DECLARE deviceCursor CURSOR FOR SELECT sc.DeviceId FROM SyncClientConfiguration sc;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN deviceCursor;
+
+  read_loop: LOOP
+    FETCH deviceCursor INTO deviceId;
+
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+
+    if not exists (SELECT * FROM SyncClientState scs WHERE scs.TableName = table_name and scs.DeviceId = deviceId) then
+      insert into SyncClientState (DeviceId, TableName, State) values (deviceId, table_name, 0);
+    END IF;
+      
+  END LOOP;
+
+  CLOSE deviceCursor;
     
 END ;;
 DELIMITER ;
@@ -371,7 +420,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateDeletedRowForDevices`(
 	IN `table_name` VARCHAR(50)
@@ -436,7 +485,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateInsertedRowForDevices`(
 	IN `table_name` VARCHAR(128),
@@ -497,7 +546,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncCreateUpdatedRowForDevices`(
 	IN `table_name` VARCHAR(128),
@@ -563,20 +612,27 @@ CREATE DEFINER=`root`@`%` PROCEDURE `SyncGetTablesToSync`(
 
 
 
+
+
+
+
+
 )
 BEGIN
 
   IF (NULLIF(device_id, '') IS NULL) THEN
-    call error('device_id');
+    call device_id_missing();
   end if;
   
   SELECT
-    t.*
+    t.*, sc.SyncMode, sc.SyncOrder
   FROM 
-    SyncLastTableChanges t left join SyncClientState c
+    SyncLastTableChanges t inner join SyncConfiguration sc
+      on t.TableName = sc.TableName
+    left join SyncClientState c
       on t.TableName = c.TableName and c.deviceId = device_id
   WHERE  
-    c.DeviceId = device_id 
+    c.DeviceId = device_id
 --    (t.LastChange>= c.SyncedTo or 
 --    c.SyncedTo is null)
 --  and
@@ -585,7 +641,7 @@ BEGIN
   and 
     (not c.SyncedTableChangesRowId = t.RowVersion or
     c.SyncedTableChangesRowId is null)
-  order by t.SyncOrder;
+  order by sc.SyncOrder, sc.SyncMode, sc.TableName;
   
 END ;;
 DELIMITER ;
@@ -601,7 +657,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncInsertOrUpdateClientState`(
 	IN `device_id` VARCHAR(50),
@@ -706,7 +762,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `SyncPullRequest`(
 	IN `device_id` VARCHAR(50),
@@ -951,6 +1007,7 @@ CREATE DEFINER=`root`@`%` PROCEDURE `SyncPullResponse`(
 
 
 
+
 )
 BEGIN
 
@@ -971,14 +1028,24 @@ BEGIN
     -- get from an to sync timestamp from client state table  
     select cs.CurrentSyncFrom, cs.CurrentSyncTo into @syncFrom, @syncTo from SyncClientState cs where CurrentSyncId = current_sync_id and DeviceId = device_id and TableName = table_name;
     
-    -- update client state
-    update 
-      SyncClientState 
-    set 
-      State = new_state, SyncedFrom = CurrentSyncFrom, SyncedTo = CurrentSyncTo, SyncedTableChangesRowId = CurrentTableChangesRowId,
-      CurrentSyncId = null, CurrentSyncFrom = null, CurrentSyncTo = null, CurrentTableChangesRowId = null
-    where
-      CurrentSyncId = current_sync_id and DeviceId = device_id and TableName = table_name;
+    if (new_state = 3) then
+      -- update client state with error
+      update 
+        SyncClientState 
+      set 
+        State = new_state
+      where
+        CurrentSyncId = current_sync_id and DeviceId = device_id and TableName = table_name;    
+    else
+      -- update client state
+      update 
+        SyncClientState 
+      set 
+        State = new_state, SyncedFrom = CurrentSyncFrom, SyncedTo = CurrentSyncTo, SyncedTableChangesRowId = CurrentTableChangesRowId,
+        CurrentSyncId = null, CurrentSyncFrom = null, CurrentSyncTo = null, CurrentTableChangesRowId = null
+      where
+        CurrentSyncId = current_sync_id and DeviceId = device_id and TableName = table_name;
+    end if;
       
     -- Protocol 
     insert into 
@@ -1008,7 +1075,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `Sync_Test` */;
+/*!50003 DROP PROCEDURE IF EXISTS `SyncResetClientState` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -1017,6 +1084,59 @@ DELIMITER ;
 /*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `SyncResetClientState`(
+	IN `device_id` VARCHAR(50),
+	IN `table_name` VARCHAR(128)
+
+
+
+)
+BEGIN
+
+  if NULLIF(table_name,'') is null then
+
+    update SyncClientState set 
+      SyncedFrom = null, SyncedTo = null,
+      SyncedTableChangesRowId = null, CurrentSyncFrom = null, CurrentSyncTo = null,
+      CurrentTableChangesRowId = null, CurrentSyncId = null
+    where 
+      DeviceId = device_id;
+
+  else    
+--    select cc.UserName into @tmpUserName from SyncClientConfiguration cc where DeviceId = device_id;  
+--    delete from SyncClientConfiguration where DeviceId = device_id;
+--    insert into SyncClientConfiguration (UserName, DeviceId) values (@tmpUserName, device_id);
+    update SyncClientState set 
+      SyncedFrom = null, SyncedTo = null,
+      SyncedTableChangesRowId = null, CurrentSyncFrom = null, CurrentSyncTo = null,
+      CurrentTableChangesRowId = null, CurrentSyncId = null
+    where 
+      DeviceId = device_id and TableName = table_name;
+    
+
+  end if;
+
+  insert into 
+    SyncProtocolClients (DeviceId, TableName, State, SyncFrom, SyncTo, SyncId, SyncResponse)
+  values
+    (device_id, table_name, 'Client state reset', null, null, null, null);
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `Sync_Test` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`%` PROCEDURE `Sync_Test`()
 BEGIN
@@ -1068,4 +1188,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26  9:31:33
+-- Dump completed on 2020-10-26  9:40:32
