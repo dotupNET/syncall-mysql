@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `MySqlSync`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
 -- Host: localhost    Database: MySqlSync
@@ -77,11 +75,11 @@ CREATE TABLE `SyncClientState` (
   `DeviceId` varchar(50) NOT NULL,
   `TableName` varchar(50) NOT NULL,
   `State` int NOT NULL DEFAULT '0',
-  `SyncedFrom` timestamp NULL DEFAULT NULL,
-  `SyncedTo` timestamp NULL DEFAULT NULL,
+  `SyncedFrom` timestamp(3) NULL DEFAULT NULL,
+  `SyncedTo` timestamp(3) NULL DEFAULT NULL,
   `SyncedTableChangesRowId` char(36) DEFAULT NULL,
-  `CurrentSyncFrom` timestamp NULL DEFAULT NULL,
-  `CurrentSyncTo` timestamp NULL DEFAULT NULL,
+  `CurrentSyncFrom` timestamp(3) NULL DEFAULT NULL,
+  `CurrentSyncTo` timestamp(3) NULL DEFAULT NULL,
   `CurrentTableChangesRowId` char(36) DEFAULT NULL,
   `CurrentSyncId` char(36) DEFAULT NULL,
   PRIMARY KEY (`DeviceId`,`TableName`)
@@ -100,11 +98,11 @@ CREATE TABLE `SyncConfiguration` (
   `TableName` varchar(128) NOT NULL,
   `SyncDirection` varchar(16) NOT NULL,
   `SelectStatement` varchar(1024) NOT NULL,
-  `SyncFromLimit` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `SyncFromLimit` timestamp(3) NOT NULL DEFAULT '1970-01-01 00:00:01.000',
   `SyncOrder` int NOT NULL DEFAULT '1',
   `SyncMode` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -121,7 +119,7 @@ DELIMITER ;;
     insert into 
       SyncLastTableChanges ( TableName, LastChange )
     values 
-      (NEW.TableName, UTC_TIMESTAMP() );
+      (NEW.TableName, current_timestamp(3) );
       
     call SyncCreateClientStateOnNewTable(NEW.TableName);
   end if;
@@ -167,7 +165,7 @@ CREATE TABLE `SyncDeletedRows` (
   `InsertedIds` json DEFAULT NULL,
   `UpdatedIds` json DEFAULT NULL,
   `DeletedIds` json DEFAULT NULL,
-  `SyncTimestamp` timestamp NULL DEFAULT NULL,
+  `SyncTimestamp` timestamp(3) NULL DEFAULT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -182,7 +180,7 @@ CREATE TABLE `SyncDeletedRows` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncDeletedRows_before_insert` BEFORE INSERT ON `SyncDeletedRows` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
     update SyncLastTableChanges set LastChange = @sync where TableName = "DeletedRows";
@@ -202,7 +200,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncDeletedRows_before_update` BEFORE UPDATE ON `SyncDeletedRows` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;
     set NEW.RowVersion = UUID();
     update SyncLastTableChanges set LastChange = @sync where TableName = "DeletedRows";
@@ -223,11 +221,11 @@ DROP TABLE IF EXISTS `SyncLastTableChanges`;
 CREATE TABLE `SyncLastTableChanges` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `TableName` varchar(128) NOT NULL,
-  `LastChange` timestamp NOT NULL,
+  `LastChange` timestamp(3) NOT NULL,
   `RowVersion` char(36) DEFAULT NULL,
   PRIMARY KEY (`RowId`),
   UNIQUE KEY `TableName` (`TableName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -277,11 +275,11 @@ CREATE TABLE `SyncProtocolClients` (
   `TableName` varchar(50) DEFAULT NULL,
   `State` varchar(50) DEFAULT NULL,
   `Error` varchar(1024) DEFAULT NULL,
-  `SyncFrom` timestamp NULL DEFAULT NULL,
-  `SyncTo` timestamp NULL DEFAULT NULL,
+  `SyncFrom` timestamp(3) NULL DEFAULT NULL,
+  `SyncTo` timestamp(3) NULL DEFAULT NULL,
   `SyncId` char(36) DEFAULT NULL,
   `SyncResponse` json DEFAULT NULL,
-  `InsertedOn` timestamp NULL DEFAULT NULL,
+  `InsertedOn` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -295,7 +293,7 @@ CREATE TABLE `SyncProtocolClients` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `SyncProtocolClients_before_insert` BEFORE INSERT ON `SyncProtocolClients` FOR EACH ROW BEGIN
-  SET NEW.InsertedOn = UTC_TIMESTAMP();
+  SET NEW.InsertedOn = current_timestamp(3);
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -459,7 +457,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = UTC_TIMESTAMP() where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -517,7 +515,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = UTC_TIMESTAMP() where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
     
 END ;;
 DELIMITER ;
@@ -565,7 +563,7 @@ BEGIN
 
   CLOSE deviceCursor;
 
-  update SyncLastTableChanges set LastChange = UTC_TIMESTAMP() where TableName = "DeletedRows";
+  update SyncLastTableChanges set LastChange = current_timestamp(3) where TableName = "DeletedRows";
 
 END ;;
 DELIMITER ;
@@ -755,7 +753,7 @@ BEGIN
   set @guid = (SELECT UUID());
   
   -- subtract 1 second to avoid multi user access problems
-  set @currentUtc = UTC_TIMESTAMP() - INTERVAL 1 SECOND;
+  set @currentUtc = current_timestamp(3);
   
   set @lastClientSync = '1970-01-01 00:00:01'; -- (select ts from SyncClientState where deviceId = DeviceId and context = TableName);
       
@@ -1039,4 +1037,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26 11:28:53
+-- Dump completed on 2020-10-26 13:20:55
