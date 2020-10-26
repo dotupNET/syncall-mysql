@@ -26,7 +26,9 @@ CREATE TABLE `TableByDate` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) NOT NULL,
-  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
+  `CreateTime` timestamp(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `UpdateTime` timestamp(3) NULL DEFAULT NULL,
+  `DeleteTime` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -41,8 +43,8 @@ CREATE TABLE `TableByDate` (
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate_BEFORE_INSERT` BEFORE INSERT ON `TableByDate` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate";
+    set NEW.CreateTime = @sync;	
+    update SyncLastTableChanges set LastCreateTime = @sync where TableName = "TableByDate";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -60,8 +62,8 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate_BEFORE_UPDATE` BEFORE UPDATE ON `TableByDate` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate";
+    set NEW.UpdateTime = @sync;	
+    update SyncLastTableChanges set LastUpdateTime = @sync where TableName = "TableByDate";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -79,6 +81,7 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate_AFTER_DELETE` AFTER DELETE ON `TableByDate` FOR EACH ROW BEGIN
 CALL CreateDeletedRowForDevices("TableByDate", OLD.RowId);
+  update SyncLastTableChanges set LastDeleteTime = @sync where TableName = "TableByDate";
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -97,7 +100,9 @@ CREATE TABLE `TableByDate2` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) NOT NULL,
-  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
+  `CreateTime` timestamp(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `UpdateTime` timestamp(3) NULL DEFAULT NULL,
+  `DeleteTime` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -112,8 +117,8 @@ CREATE TABLE `TableByDate2` (
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate2_before_insert` BEFORE INSERT ON `TableByDate2` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate2";
+    set NEW.CreateTime = @sync;	
+    update SyncLastTableChanges set LastCreateTime = @sync where TableName = "TableByDate2";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -131,8 +136,8 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate2_before_update` BEFORE UPDATE ON `TableByDate2` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate2";
+    set NEW.UpdateTime = @sync;	
+    update SyncLastTableChanges set LastUpdateTime = @sync where TableName = "TableByDate2";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -150,6 +155,7 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate2_after_delete` AFTER DELETE ON `TableByDate2` FOR EACH ROW BEGIN
     CALL CreateDeletedRowForDevices("TableByDate2", OLD.RowId);
+  update SyncLastTableChanges set LastDeleteTime = @sync where TableName = "TableByDate2";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -168,7 +174,9 @@ CREATE TABLE `TableByDate3` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) DEFAULT NULL,
-  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
+  `CreateTime` timestamp(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `UpdateTime` timestamp(3) NULL DEFAULT NULL,
+  `DeleteTime` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -183,8 +191,8 @@ CREATE TABLE `TableByDate3` (
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate3_before_insert` BEFORE INSERT ON `TableByDate3` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate3";
+    set NEW.CreateTime = @sync;	
+    update SyncLastTableChanges set LastCreateTime = @sync where TableName = "TableByDate3";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -202,8 +210,8 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate3_before_update` BEFORE UPDATE ON `TableByDate3` FOR EACH ROW BEGIN
     set @sync = current_timestamp(3);
-    set NEW.syncTimestamp = @sync;	
-    update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate3";
+    set NEW.UpdateTime = @sync;	
+    update SyncLastTableChanges set LastUpdateTime = @sync where TableName = "TableByDate3";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -221,6 +229,7 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate3_after_delete` AFTER DELETE ON `TableByDate3` FOR EACH ROW BEGIN
     CALL CreateDeletedRowForDevices("TableByDate3", OLD.RowId);
+    update SyncLastTableChanges set LastDeleteTime = @sync where TableName = "TableByDate3";
   END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
