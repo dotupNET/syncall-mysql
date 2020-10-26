@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `MySqlSync` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `MySqlSync`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
 -- Host: localhost    Database: MySqlSync
@@ -28,9 +26,9 @@ CREATE TABLE `TableByDate` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) NOT NULL,
-  `syncTimestamp` timestamp NULL DEFAULT NULL,
+  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -42,7 +40,7 @@ CREATE TABLE `TableByDate` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate_BEFORE_INSERT` BEFORE INSERT ON `TableByDate` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate";
 END */;;
@@ -61,7 +59,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate_BEFORE_UPDATE` BEFORE UPDATE ON `TableByDate` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate";
 END */;;
@@ -99,7 +97,7 @@ CREATE TABLE `TableByDate2` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) NOT NULL,
-  `syncTimestamp` timestamp NULL DEFAULT NULL,
+  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -113,7 +111,7 @@ CREATE TABLE `TableByDate2` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate2_before_insert` BEFORE INSERT ON `TableByDate2` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate2";
   END */;;
@@ -132,7 +130,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate2_before_update` BEFORE UPDATE ON `TableByDate2` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate2";
   END */;;
@@ -170,7 +168,7 @@ CREATE TABLE `TableByDate3` (
   `RowId` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `Ort` varchar(50) DEFAULT NULL,
-  `syncTimestamp` timestamp NULL DEFAULT NULL,
+  `syncTimestamp` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`RowId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -184,7 +182,7 @@ CREATE TABLE `TableByDate3` (
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate3_before_insert` BEFORE INSERT ON `TableByDate3` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate3";
   END */;;
@@ -203,7 +201,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`%`*/ /*!50003 TRIGGER `TableByDate3_before_update` BEFORE UPDATE ON `TableByDate3` FOR EACH ROW BEGIN
-    set @sync = UTC_TIMESTAMP();
+    set @sync = current_timestamp(3);
     set NEW.syncTimestamp = @sync;	
     update SyncLastTableChanges set LastChange = @sync where TableName = "TableByDate3";
   END */;;
@@ -371,4 +369,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-26 12:25:54
+-- Dump completed on 2020-10-26 13:23:49
